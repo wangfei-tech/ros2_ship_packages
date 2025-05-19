@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<package format="3">
+  <name>ros2_ship_description</name>
+  <version>0.0.0</version>
+  <description>ROS 2 port of the ros_ship_description package</description>
+
+  <maintainer email="wang_fei_b@163.com">masaya</maintainer>
+  <license>BSD</license>
+
+  <buildtool_depend>ament_cmake</buildtool_depend>
+
+  <depend>gazebo_ros</depend>
+  <depend>gazebo_dev</depend>
+  <depend>xacro</depend>
+  <depend>urdf</depend>
+  <depend>ament_index_cpp</depend>
+
+  <!-- 如果使用launch files -->
+  <exec_depend>launch</exec_depend>
+  <exec_depend>launch_ros</exec_depend>
+
+  <!-- Optional export for Gazebo plugins and models -->
+  <export>
+    <gazebo_ros
+      gazebo_plugin_path="${prefix}/lib"
+      gazebo_model_path="${prefix}/../"
+      gazebo_resource_path="${prefix}/../"
+      gazebo_media_path="${prefix}/../"/>
+  </export>
+</package>

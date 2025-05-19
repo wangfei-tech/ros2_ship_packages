@@ -1,0 +1,15 @@
+<library path="lib/libship_controller">
+
+  <class name="ship_controller/ShipController" type="ship_controller::ShipController" base_class_type="controller_interface::ControllerBase">
+    <description>
+      Ros ship controller. It recieves /cmd_vel and /twist topic
+    </description>
+  </class>
+
+  <class name="driving_force_controller/DrivingForceController" type="driving_force_controller::DrivingForceController" base_class_type="controller_interface::ControllerBase">
+    <description>
+      Ros ship controller. It recieves /twist and control driving force of the motor
+    </description>
+  </class>
+
+</library>
