@@ -34,7 +34,7 @@
  *********************************************************************/
 
 #include "overlay_utils.h"
-#include <ros/ros.h>
+#include "rclcpp/rclcpp.hpp"   // ROS2头文件替换
 
 namespace ros_ship_visualization
 {
@@ -143,11 +143,11 @@ namespace ros_ship_visualization
   {
     const std::string texture_name = name_ + "Texture";
     if (width == 0) {
-      ROS_WARN("[OverlayObject] width=0 is specified as texture size");
+      RCLCPP_WARN(rclcpp::get_logger("OverlayObject"), "[OverlayObject] width=0 is specified as texture size");
       width = 1;
     }
     if (height == 0) {
-      ROS_WARN("[OverlayObject] height=0 is specified as texture size");
+      RCLCPP_WARN(rclcpp::get_logger("OverlayObject"), "[OverlayObject] height=0 is specified as texture size");
       height = 1;
     }
     if (!isTextureReady() ||
@@ -173,6 +173,7 @@ namespace ros_ship_visualization
       panel_material_->getTechnique(0)->getPass(0)
         ->setSceneBlending(Ogre::SBT_TRANSPARENT_ALPHA);
     }
+    return true;
   }
 
   ScopedPixelBuffer OverlayObject::getBuffer()

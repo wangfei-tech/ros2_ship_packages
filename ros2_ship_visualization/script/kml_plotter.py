@@ -1,45 +1,48 @@
-#!/usr/bin/env python
-import rospy
+#!/usr/bin/env python3
+import rclpy
+from rclpy.node import Node
 import simplekml
 from sensor_msgs.msg import NavSatFix
 import rospkg
 
-class plotter:
+class Plotter(Node):
     def __init__(self):
+        super().__init__('kml_plotter_node')
         self.kml = simplekml.Kml()
         rospack = rospkg.RosPack()
         self.package_path = rospack.get_path('ros_ship_visualization')
-        self.latitudes = []
-        self.longitudes = []
         self.is_start_time = True
-        self.last_recieved_data = NavSatFix()
-        self.fix_sub = rospy.Subscriber("/fix", NavSatFix, self.fix_callback)
-    def fix_callback(self,data):
+        self.last_recieved_data = None
+        self.fix_sub = self.create_subscription(NavSatFix, '/fix', self.fix_callback, 10)
+
+    def fix_callback(self, data):
         self.last_recieved_data = data
-        #self.kml.newpoint(name=unicode(str(data.header.stamp), 'utf-8'), coords=[(data.latitude, data.longitude)])
-        self.kml.newpoint(name=unicode("", 'utf-8'), coords=[(data.latitude, data.longitude)])
-        if self.is_start_time == True:
-            self.kml.newpoint(name=unicode("start point", 'utf-8'), coords=[(data.latitude, data.longitude)])
-        self.is_start_time = False
-        #self.latitudes.append(data.latitude)
-        #self.longitudes.append(data.longitude)
+        # simplekml的coords顺序是 (经度, 纬度)
+        self.kml.newpoint(name="", coords=[(data.longitude, data.latitude)])
+        if self.is_start_time:
+            self.kml.newpoint(name="start point", coords=[(data.longitude, data.latitude)])
+            self.is_start_time = False
 
     def save(self):
-        self.kml.newpoint(name=unicode("finished point", 'utf-8'), coords=[(self.last_recieved_data.latitude, self.last_recieved_data.longitude)])
-        #for i in range(len(self.longitudes)-1):
-            #longitude = self.longitudes[i]
-            #latitude = self.latitudes[i]
-            #next_longitude = self.longitudes[i+1]
-            #next_latitude = self.latitudes[i+1]
-            #ls = self.kml.newlinestring(name='trajectory')
-            #ls.coords = [(longitude,latitude,10.0), (next_longitude,next_latitude,10.0)]
-            #ls.extrude = 1
-            #ls.altitudemode = simplekml.AltitudeMode.relativetoground
-        self.kml.save(self.package_path+"/data/gps_log.kml")
-        rospy.loginfo("gps log was written in "+self.package_path+"/data/gps_log.kml")
+        if self.last_recieved_data is not None:
+            self.kml.newpoint(name="finished point", coords=[(self.last_recieved_data.longitude, self.last_recieved_data.latitude)])
+            save_path = self.package_path + "/data/gps_log.kml"
+            self.kml.save(save_path)
+            self.get_logger().info(f"gps log was written in {save_path}")
+        else:
+            self.get_logger().warn("No GPS data received, nothing to save.")
+
+def main(args=None):
+    rclpy.init(args=args)
+    kml_plotter = Plotter()
+    try:
+        rclpy.spin(kml_plotter)
+    except KeyboardInterrupt:
+        pass
+    finally:
+        kml_plotter.save()
+        kml_plotter.destroy_node()
+        rclpy.shutdown()
 
 if __name__ == '__main__':
-    rospy.init_node('kml_plotter_node')
-    kml_plotter = plotter()
-    rospy.spin()
-    kml_plotter.save()
+    main()

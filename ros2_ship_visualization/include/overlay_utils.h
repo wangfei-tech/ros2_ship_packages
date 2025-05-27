@@ -1,49 +1,13 @@
-// -*- mode: c++ -*-
-/*********************************************************************
- * Software License Agreement (BSD License)
- *
- *  Copyright (c) 2014, JSK Lab
- *  All rights reserved.
- *
- *  Redistribution and use in source and binary forms, with or without
- *  modification, are permitted provided that the following conditions
- *  are met:
- *
- *   * Redistributions of source code must retain the above copyright
- *     notice, this list of conditions and the following disclaimer.
- *   * Redistributions in binary form must reproduce the above
- *     copyright notice, this list of conditions and the following
- *     disclaimer in the documentation and/o2r other materials provided
- *     with the distribution.
- *   * Neither the name of the JSK Lab nor the names of its
- *     contributors may be used to endorse or promote products derived
- *     from this software without specific prior written permission.
- *
- *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- *  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- *  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
- *  FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
- *  COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- *  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- *  BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
- *  LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
- *  CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
- *  LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
- *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- *  POSSIBILITY OF SUCH DAMAGE.
- *********************************************************************/
-
 #ifndef OVERLAY_UTIL_H_
 #define OVERLAY_UTIL_H_
-
 
 #include <OGRE/OgreMaterialManager.h>
 #include <OGRE/OgreTextureManager.h>
 #include <OGRE/OgreTexture.h>
 #include <OGRE/OgreTechnique.h>
 #include <OGRE/OgreHardwarePixelBuffer.h>
-// see OGRE/OgrePrerequisites.h
-//#define OGRE_VERSION    ((OGRE_VERSION_MAJOR << 16) | (OGRE_VERSION_MINOR << 8) | OGRE_VERSION_PATCH)
+
+// 根据 Ogre 版本选择包含路径，ROS2中如果使用 Ogre 1.9 应保持不变
 #if OGRE_VERSION < ((1 << 16) | (9 << 8) | 0)
   #include <OGRE/OgrePanelOverlayElement.h>
   #include <OGRE/OgreOverlayElement.h>
@@ -58,6 +22,9 @@
 
 #include <QImage>
 #include <QColor>
+
+// C++11 智能指针替换 boost::shared_ptr
+#include <memory>
 
 namespace ros_ship_visualization
 {
@@ -79,14 +46,14 @@ namespace ros_ship_visualization
 
   };
 
-
-  // this is a class for put overlay object on rviz 3D panel.
+  // this is a class for putting overlay object on rviz 3D panel.
   // This class suppose to be instantiated in onInitialize method
-  // of rviz::Display class.
+  // of rviz_common::Display class in ROS 2.
   class OverlayObject
   {
   public:
-    typedef boost::shared_ptr<OverlayObject> Ptr;
+    // 使用 std::shared_ptr 替代 boost::shared_ptr
+    typedef std::shared_ptr<OverlayObject> Ptr;
 
     OverlayObject(const std::string& name);
     virtual ~OverlayObject();
@@ -118,4 +85,4 @@ namespace ros_ship_visualization
   // Ogre::MaterialPtr createOverlayMaterial(Ogre::Overlay* overlay);
 }
 
-#endif
+#endif  // OVERLAY_UTIL_H_
